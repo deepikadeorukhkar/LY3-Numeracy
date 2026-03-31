@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordinal Numbers Train Game</title>
+
+<style>
+body{
+    font-family: 'Comic Sans MS', cursive;
+    background: linear-gradient(to bottom,#87CEFA,#ffffff);
+    text-align:center;
+    margin:0;
+    padding:0;
+}
+
+h1{
+    margin-top:10px;
+    color:#333;
+}
+
+.train{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    margin-top:30px;
+    flex-wrap:wrap;
+}
+
+.engine{
+    width:120px;
+    height:100px;
+    background:#ff4757;
+    border-radius:10px;
+    position:relative;
+    margin-right:5px;
+}
+
+.engine:before{
+    content:"";
+    position:absolute;
+    width:40px;
+    height:40px;
+    background:#333;
+    border-radius:50%;
+    bottom:-20px;
+    left:10px;
+}
+
+.engine:after{
+    content:"";
+    position:absolute;
+    width:40px;
+    height:40px;
+    background:#333;
+    border-radius:50%;
+    bottom:-20px;
+    right:10px;
+}
+
+.compartment{
+    width:90px;
+    height:90px;
+    background:#ffa502;
+    margin:5px;
+    border-radius:8px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    font-weight:bold;
+    color:white;
+}
+
+.compartment:nth-child(even){ background:#2ed573; }
+.compartment:nth-child(odd){ background:#1e90ff; }
+
+.wheel{
+    width:25px;
+    height:25px;
+    background:#333;
+    border-radius:50%;
+    position:absolute;
+    bottom:-15px;
+}
+
+.wheel.left{ left:8px; }
+.wheel.right{ right:8px; }
+
+.dropzone{
+    width:100%;
+    height:100%;
+}
+
+.numbers{
+    margin-top:60px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:15px;
+}
+
+.draggable{
+    width:70px;
+    height:70px;
+    background:#ff6b81;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:20px;
+    cursor:grab;
+    user-select:none;
+}
+
+.correct{
+    background:#2ed573 !important;
+}
+
+.wrong{
+    background:#ff4757 !important;
+}
+
+#message{
+    font-size:28px;
+    height:40px;
+    margin-top:10px;
+}
+
+button{
+    margin-top:20px;
+    padding:12px 30px;
+    font-size:18px;
+    border:none;
+    background:#3742fa;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    pointer-events:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Ordinal Numbers Train (1st - 10th)</h1>
+
+<div id="message"></div>
+
+<div class="train" id="train">
+
+<div class="engine"></div>
+
+</div>
+
+<div class="numbers" id="numbers"></div>
+
+<button onclick="restartGame()">Restart</button>
+
+<canvas id="confetti"></canvas>
+
+<audio id="correctSound" src="https://cdn.jsdelivr.net/gh/naptha/talkify-tts/examples/audio/success.mp3"></audio>
+<audio id="wrongSound" src="https://cdn.jsdelivr.net/gh/naptha/talkify-tts/examples/audio/fail.mp3"></audio>
+<audio id="clapSound" src="https://cdn.jsdelivr.net/gh/jshawl/AudioFX/sounds/applause.mp3"></audio>
+
+<script>
+
+const ordinals=["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th"];
+const train=document.getElementById("train");
+const numbersDiv=document.getElementById("numbers");
+const message=document.getElementById("message");
+let placed=1; // first already fixed
+
+function createTrain(){
+    for(let i=0;i<10;i++){
+        let comp=document.createElement("div");
+        comp.className="compartment";
+        comp.dataset.index=i;
+        
+        let drop=document.createElement("div");
+        drop.className="dropzone";
+        drop.ondragover=(e)=>e.preventDefault();
+        drop.ondrop=dropNumber;
+        
+        if(i===0){
+            drop.innerHTML="1st";
+        }
+        
+        comp.appendChild(drop);
+        
+        let w1=document.createElement("div");
+        w1.className="wheel left";
+        let w2=document.createElement("div");
+        w2.className="wheel right";
+        
+        comp.appendChild(w1);
+        comp.appendChild(w2);
+        
+        train.appendChild(comp);
+    }
+}
+
+function createNumbers(){
+    for(let i=1;i<ordinals.length;i++){
+        let box=document.createElement("div");
+        box.className="draggable";
+        box.textContent=ordinals[i];
+        box.draggable=true;
+        box.id="drag-"+i;
+        box.dataset.index=i;
+        
+        box.ondragstart=(e)=>{
+            e.dataTransfer.setData("text",i);
+        }
+        
+        numbersDiv.appendChild(box);
+    }
+}
+
+function dropNumber(e){
+    e.preventDefault();
+    let index=e.dataTransfer.getData("text");
+    let target=e.target;
+    let parent=target.closest('.compartment');
+    let compIndex=parent.dataset.index;
+    
+    if(index==compIndex){
+        target.innerHTML=ordinals[index];
+        document.getElementById("drag-"+index).style.display="none";
+        parent.classList.add("correct");
+        document.getElementById("correctSound").play();
+        message.innerHTML="✅ Correct!";
+        placed++;
+        
+        if(placed===10){
+            celebrate();
+        }
+    }else{
+        parent.classList.add("wrong");
+        document.getElementById("wrongSound").play();
+        message.innerHTML="❌ Try Again";
+        setTimeout(()=>{
+            parent.classList.remove("wrong");
+            message.innerHTML="";
+        },800);
+    }
+}
+
+function restartGame(){
+    train.innerHTML='<div class="engine"></div>';
+    numbersDiv.innerHTML="";
+    placed=1;
+    message.innerHTML="";
+    createTrain();
+    createNumbers();
+}
+
+createTrain();
+createNumbers();
+
+
+
+// confetti
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let pieces=[];
+
+function celebrate(){
+    document.getElementById("clapSound").play();
+    message.innerHTML="🎉 Great Job!";
+    for(let i=0;i<150;i++){
+        pieces.push({
+            x:Math.random()*canvas.width,
+            y:Math.random()*canvas.height- canvas.height,
+            r:Math.random()*6+4,
+            d:Math.random()*50,
+            color:`hsl(${Math.random()*360},100%,50%)`,
+            tilt:Math.random()*10-10
+        })
+    }
+    animateConfetti();
+}
+
+function animateConfetti(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let i=0;i<pieces.length;i++){
+        let p=pieces[i];
+        ctx.beginPath();
+        ctx.fillStyle=p.color;
+        ctx.fillRect(p.x,p.y,p.r,p.r);
+    }
+    updateConfetti();
+    requestAnimationFrame(animateConfetti);
+}
+
+function updateConfetti(){
+    for(let i=0;i<pieces.length;i++){
+        let p=pieces[i];
+        p.y+=2;
+        if(p.y>canvas.height){
+            p.y=-10;
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>
