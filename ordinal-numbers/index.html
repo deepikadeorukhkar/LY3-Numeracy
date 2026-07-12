@@ -26,13 +26,13 @@
             align-items: center;
         }
 
-        /* --- Preschool Decorative Backdrop Layer --- */
+        /* --- Minimal Preschool Decorative Backdrop Layer --- */
         .sky-decorations {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 35%;
+            height: 25%;
             pointer-events: none;
             z-index: 1;
             overflow: hidden;
@@ -40,63 +40,26 @@
 
         .sun {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            width: 44px;
-            height: 44px;
+            top: 5px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
             background: #fef08a;
-            border: 3px solid #facc15;
+            border: 2px solid #facc15;
             border-radius: 50%;
-            box-shadow: 0 0 12px #fde047;
+            box-shadow: 0 0 8px #fde047;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
+            font-size: 14px;
         }
 
-        .cloud {
-            position: absolute;
-            background: #ffffff;
-            border-radius: 20px;
-            opacity: 0.9;
-        }
-        .cloud-1 { width: 60px; height: 22px; top: 8%; left: 8%; }
-        .cloud-2 { width: 80px; height: 26px; top: 18%; right: 20%; }
-
-        /* --- Intro / Splash Screen --- */
-        #intro-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease-out;
-        }
-
-        .logo-box {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-
-        .logo-img {
-            width: 160px;
-            height: auto;
-            max-width: 80vw;
-            object-fit: contain;
-        }
-
-        /* --- Main Game Layout Container --- */
+        /* --- Main Game Layout Container (Locks strictly to screen boundaries) --- */
         #game-container {
             width: 100%;
+            height: 100vh;
             height: 100dvh; 
-            max-width: 600px; 
+            max-width: 480px; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -114,46 +77,48 @@
             width: 100%;
             flex-shrink: 0;
             z-index: 10;
-            margin-bottom: 2px;
         }
 
         h1 {
-            font-size: 20px;
+            font-size: 18px;
             color: #1e3a8a;
             text-shadow: 1px 1px 0 #fff;
             margin-bottom: 1px;
         }
 
         .instructions {
-            font-size: 11px;
+            font-size: 10px;
             color: #334155;
             font-weight: 500;
             background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #cbd5e1;
-            padding: 4px 8px;
-            border-radius: 10px;
-            line-height: 1.3;
+            border: 1px solid #cbd5e1;
+            padding: 3px 6px;
+            border-radius: 8px;
+            line-height: 1.2;
         }
 
+        /* Wrapper fills exactly what space is left over vertically */
         #board-wrapper {
             position: relative;
             width: 100%;
-            height: calc(100% - 130px);
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             gap: 4px;
+            margin: 4px 0;
+            height: calc(100% - 110px);
         }
 
-        /* --- ULTRA VISIBLE & MASSIVE TRACKS AREA --- */
+        /* --- IMMERSIVE RESPONSIVE TRACKS AREA --- */
         #race-track {
             position: relative;
             width: 100%;
-            flex-grow: 1; 
+            height: 72vh; /* Hard locks track block to viewport ratio to prevent mobile page spill */
             background: #27272a; 
-            border: 5px solid #fbbf24; 
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 4px solid #fbbf24; 
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -162,42 +127,42 @@
         /* Finish Line fixed on the left side */
         .finish-line {
             position: absolute;
-            left: 70px;
+            left: 55px;
             top: 0;
-            width: 24px;
+            width: 18px;
             height: 100%;
-            background: repeating-linear-gradient(0deg, #fff, #fff 14px, #000 14px, #000 28px);
+            background: repeating-linear-gradient(0deg, #fff, #fff 10px, #000 10px, #000 20px);
             z-index: 2;
-            box-shadow: 4px 0 8px rgba(0,0,0,0.4);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.4);
         }
 
         .finish-text {
             position: absolute;
-            left: 14px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%) rotate(-90deg);
-            font-size: 18px;
+            font-size: 12px;
             font-weight: 900;
             color: #ffffff;
-            text-shadow: 1px 1px 3px #000;
-            letter-spacing: 3px;
+            text-shadow: 1px 1px 2px #000;
+            letter-spacing: 2px;
         }
 
-        /* Maximized Track Lanes height */
+        /* 10 Perfectly divided flexible mobile lanes */
         .lane {
             flex: 1;
             display: flex;
             align-items: center;
             position: relative;
-            border-bottom: 3px dashed rgba(255, 255, 255, 0.4);
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
         }
         .lane:last-child { border-bottom: none; }
 
-        /* --- GIANT UP-SCALED CARS WITH SIDE DROP BOXES --- */
+        /* --- BIG CARS WITH RESPONSIVE SCALING SIDE DROP BOXES --- */
         .car-container {
             position: absolute;
-            width: 105px;  
-            height: 94%;   
+            width: 76px;  /* Big finger-friendly touch target width */
+            height: 94%;  /* Fills lane cleanly */
             display: flex;
             align-items: center;
         }
@@ -205,70 +170,71 @@
         .car-svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
         }
 
-        /* Target boxes positioned cleanly BESIDE the car on its right hand side */
+        /* Target box safely alongside car bumper */
         .drop-zone {
             position: absolute;
-            right: -32px;  
-            width: 26px;   
-            height: 26px;  
+            right: -24px;  
+            width: 22px;   
+            height: 22px;  
             background: #ffffff;
             border: 2px solid #2563eb;
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 11px;
+            font-size: 9px;
             font-weight: bold;
             color: #2563eb;
             z-index: 10;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
             transition: all 0.2s;
         }
 
         .drop-zone.active-target {
             border-color: #22c55e;
             background-color: #f0fdf4;
-            transform: scale(1.2);
+            transform: scale(1.15);
         }
 
         .drop-zone.completed {
             background-color: #22c55e;
-            border: 2px solid #16a34a;
+            border: 1px solid #16a34a;
             color: #ffffff;
-            font-size: 10px;
+            font-size: 9px;
         }
 
-        /* --- MINIFIED COMPACT SOURCE DECK FLAGS --- */
+        /* --- SLIM FOOTPRINT SOURCE DRAG FLAGS DECK --- */
         #flag-deck {
             width: 100%;
             background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 2px dashed #64748b;
-            min-height: 48px; 
+            min-height: 42px; 
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 4px;
-            padding: 5px;
+            padding: 4px;
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .flag-card {
             background: #ffedd5;
-            border: 2px solid #ea580c;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1.5px solid #ea580c;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #c2410c;
             cursor: grab;
             touch-action: none; 
-            height: 32px; 
+            height: 26px; 
             position: relative;
         }
 
@@ -279,68 +245,57 @@
             justify-content: center;
             gap: 12px;
             z-index: 10;
-            margin-top: 2px;
+            flex-shrink: 0;
         }
 
         .hud-btn {
             background: #3b82f6;
             color: white;
             border: none;
-            padding: 6px 14px;
-            border-radius: 14px;
+            padding: 4px 12px;
+            border-radius: 12px;
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 3px 0 #2563eb;
+            box-shadow: 0 2px 0 #2563eb;
         }
 
         .hud-btn:active {
-            transform: translateY(3px);
+            transform: translateY(2px);
             box-shadow: none;
         }
 
-        /* --- Feedback Screens --- */
-        #feedback-overlay {
+        /* --- Splash / Feedback Screes --- */
+        #intro-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 2000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.4s ease-out;
         }
+        .logo-box { background: #f8fafc; padding: 15px; border-radius: 16px; }
+        .logo-img { width: 130px; height: auto; }
 
-        .feedback-emoji { font-size: 80px; }
-        .feedback-text { font-size: 26px; font-weight: bold; margin-top: 10px; }
+        #feedback-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85); display: none;
+            justify-content: center; align-items: center; flex-direction: column; z-index: 2000;
+        }
+        .feedback-emoji { font-size: 60px; }
+        .feedback-text { font-size: 22px; font-weight: bold; margin-top: 5px; }
 
         #completion-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #f0fdf4;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-            text-align: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f0fdf4; display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 3000; text-align: center;
         }
-
-        .completion-message { font-size: 28px; font-weight: bold; color: #166534; margin-bottom: 20px; }
+        .completion-message { font-size: 24px; font-weight: bold; color: #166534; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
     <div class="sky-decorations">
         <div class="sun">🌞</div>
-        <div class="cloud cloud-1"></div>
-        <div class="cloud cloud-2"></div>
     </div>
 
     <audio id="audio-bg" src="assets/background-music.mp3" loop></audio>
@@ -356,7 +311,7 @@
     <div id="game-container">
         <header>
             <h1>Ordinal Numbers</h1>
-            <div class="instructions">Look at the race track and drag each ranking flag to the correct car according to its position from the finish line.</div>
+            <div class="instructions">Drag each ranking flag to the correct car position from the finish line.</div>
         </header>
 
         <div id="board-wrapper">
@@ -369,7 +324,7 @@
 
         <div id="hud">
             <button class="hud-btn" id="btn-audio">🔊 Listen</button>
-            <button class="hud-btn" id="btn-restart" style="background:#ef4444; box-shadow:0 3px 0 #dc2626;">Restart</button>
+            <button class="hud-btn" id="btn-restart" style="background:#ef4444; box-shadow:0 2px 0 #dc2626;">Restart</button>
         </div>
     </div>
 
@@ -448,12 +403,12 @@
                 const carContainer = document.createElement("div");
                 carContainer.classList.add("car-container");
                 
-                // Pulled 1st place car right forward against finish boundary line (96px offset)
-                // Optimized the stepping intervals (31px) so the 10th car fits perfectly inside the view boundary
-                const baseLeftOffset = 96; 
-                const horizontalStepInterval = 31; 
-                const leftPixelDistance = baseLeftOffset + ((i - 1) * horizontalStepInterval);
-                carContainer.style.left = leftPixelDistance + "px";
+                // Converted strictly to percentage calculations (%) so spacing dynamically 
+                // shrinks or expands perfectly on all phone screens without overflow.
+                const basePercentLeft = 18; 
+                const percentStepInterval = 5.8; 
+                const leftPercentDistance = basePercentLeft + ((i - 1) * percentStepInterval);
+                carContainer.style.left = leftPercentDistance + "%";
                 
                 carContainer.innerHTML = getCarSVG(carColors[i - 1]);
 
@@ -491,8 +446,8 @@
                 element.style.transition = 'none';
                 element.style.zIndex = '999';
                 element.style.position = 'fixed';
-                element.style.width = '30px';  
-                element.style.height = '22px';
+                element.style.width = '26px';  
+                element.style.height = '20px';
                 
                 moveAt(clientX, clientY);
                 speakText(element.dataset.code);
@@ -517,8 +472,8 @@
             };
 
             function moveAt(nx, ny) {
-                element.style.left = (nx - 15) + 'px';
-                element.style.top = (ny - 11) + 'px';
+                element.style.left = (nx - 13) + 'px';
+                element.style.top = (ny - 10) + 'px';
             }
 
             const onEnd = (e) => {
