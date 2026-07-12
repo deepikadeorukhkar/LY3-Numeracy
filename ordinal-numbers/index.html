@@ -1,1 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ordinal Numbers Race</title>
+    <style>
+        /* --- CSS Reset & Global Layout Framework --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            user-select: none;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+        }
 
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+            background: linear-gradient(to bottom, #bae6fd 0%, #e0f2fe 35%, #bbf7d0 35%, #86efac 100%);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Preschool Decorative Backdrop Layer --- */
+        .sky-decorations {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .sun {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: #fef08a;
+            border: 3px solid #facc15;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #fde047;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .cloud {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 20px;
+            opacity: 0.9;
+        }
+        .cloud-1 { width: 60px; height: 22px; top: 8%; left: 8%; }
+        .cloud-2 { width: 80px; height: 26px; top: 18%; right: 20%; }
+
+        /* --- Intro / Splash Screen --- */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .logo-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .logo-img {
+            width: 160px;
+            height: auto;
+            max-width: 80vw;
+            object-fit: contain;
+        }
+
+        /* --- Main Game Layout Container --- */
+        #game-container {
+            width: 100%;
+            height: 100dvh; 
+            max-width: 600px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 4px;
+            opacity: 0;
+            z-index: 5;
+            transition: opacity 0.5s ease-in;
+        }
+
+        #game-container.visible { opacity: 1; }
+
+        header {
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            z-index: 10;
+            margin-bottom: 2px;
+        }
+
+        h1 {
+            font-size: 20px;
+            color: #1e3a8a;
+            text-shadow: 1px 1px 0 #fff;
+            margin-bottom: 1px;
+        }
+
+        .instructions {
+            font-size: 11px;
+            color: #334155;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #cbd5e1;
+            padding: 4px 8px;
+            border-radius: 10px;
+            line-height: 1.3;
+        }
+
+        #board-wrapper {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 130px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 4px;
+        }
+
+        /* --- ULTRA VISIBLE & MASSIVE TRACKS AREA --- */
+        #race-track {
+            position: relative;
+            width: 100%;
+            flex-grow: 1; 
+            background: #27272a; 
+            border: 5px solid #fbbf24; 
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Finish Line fixed on the left side */
+        .finish-line {
+            position: absolute;
+            left: 70px;
+            top: 0;
+            width: 24px;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, #fff, #fff 14px, #000 14px, #000 28px);
+            z-index: 2;
+            box-shadow: 4px 0 8px rgba(0,0,0,0.4);
+        }
+
+        .finish-text {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 18px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px #000;
+            letter-spacing: 3px;
+        }
+
+        /* Maximized Track Lanes height */
+        .lane {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+            border-bottom: 3px dashed rgba(255, 255, 255, 0.4);
+        }
+        .lane:last-child { border-bottom: none; }
+
+        /* --- GIANT UP-SCALED CARS WITH SIDE DROP BOXES --- */
+        .car-container {
+            position: absolute;
+            width: 105px;  
+            height: 94%;   
+            display: flex;
+            align-items: center;
+        }
+
+        .car-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.4));
+        }
+
+        /* Target boxes positioned cleanly BESIDE the car on its right hand side */
+        .drop-zone {
+            position: absolute;
+            right: -32px;  
+            width: 26px;   
+            height: 26px;  
+            background: #ffffff;
+            border: 2px solid #2563eb;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: #2563eb;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            transition: all 0.2s;
+        }
+
+        .drop-zone.active-target {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+            transform: scale(1.2);
+        }
+
+        .drop-zone.completed {
+            background-color: #22c55e;
+            border: 2px solid #16a34a;
+            color: #ffffff;
+            font-size: 10px;
+        }
+
+        /* --- MINIFIED COMPACT SOURCE DECK FLAGS --- */
+        #flag-deck {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            border: 2px dashed #64748b;
+            min-height: 48px; 
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            padding: 5px;
+            z-index: 10;
+        }
+
+        .flag-card {
+            background: #ffedd5;
+            border: 2px solid #ea580c;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #c2410c;
+            cursor: grab;
+            touch-action: none; 
+            height: 32px; 
+            position: relative;
+        }
+
+        /* --- Controls HUD Layout --- */
+        #hud {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 10;
+            margin-top: 2px;
+        }
+
+        .hud-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #2563eb;
+        }
+
+        .hud-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        /* --- Feedback Screens --- */
+        #feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        .feedback-emoji { font-size: 80px; }
+        .feedback-text { font-size: 26px; font-weight: bold; margin-top: 10px; }
+
+        #completion-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f0fdf4;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            text-align: center;
+        }
+
+        .completion-message { font-size: 28px; font-weight: bold; color: #166534; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="sky-decorations">
+        <div class="sun">🌞</div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+    </div>
+
+    <audio id="audio-bg" src="assets/background-music.mp3" loop></audio>
+    <audio id="audio-correct" src="assets/correct.mp3"></audio>
+    <audio id="audio-wrong" src="assets/wrong.mp3"></audio>
+
+    <div id="intro-screen">
+        <div class="logo-box">
+            <img class="logo-img" src="assets/innovine-logo.png" alt="Logo">
+        </div>
+    </div>
+
+    <div id="game-container">
+        <header>
+            <h1>Ordinal Numbers</h1>
+            <div class="instructions">Look at the race track and drag each ranking flag to the correct car according to its position from the finish line.</div>
+        </header>
+
+        <div id="board-wrapper">
+            <div id="race-track">
+                <div class="finish-line"></div>
+                <div class="finish-text">FINISH</div>
+            </div>
+            <div id="flag-deck"></div>
+        </div>
+
+        <div id="hud">
+            <button class="hud-btn" id="btn-audio">🔊 Listen</button>
+            <button class="hud-btn" id="btn-restart" style="background:#ef4444; box-shadow:0 3px 0 #dc2626;">Restart</button>
+        </div>
+    </div>
+
+    <div id="feedback-overlay">
+        <div class="feedback-emoji" id="feedback-emoji">👏</div>
+        <div class="feedback-text" id="feedback-text">Great Job!</div>
+    </div>
+
+    <div id="completion-screen">
+        <div class="completion-message" id="completion-msg">Fantastic Racing!</div>
+        <button class="hud-btn" id="btn-final-restart">Play Again</button>
+    </div>
+
+    <script>
+        const ordinalData = [
+            { code: "1st", value: 1 }, { code: "2nd", value: 2 }, { code: "3rd", value: 3 },
+            { code: "4th", value: 4 }, { code: "5th", value: 5 }, { code: "6th", value: 6 },
+            { code: "7th", value: 7 }, { code: "8th", value: 8 }, { code: "9th", value: 9 }, { code: "10th", value: 10 }
+        ];
+
+        const carColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#ec4899", "#a855f7", "#06b6d4", "#f97316", "#0ea5e9", "#6366f1"];
+
+        let matchedCount = 0;
+        let draggedElement = null;
+        let audioStarted = false;
+
+        const raceTrack = document.getElementById("race-track");
+        const flagDeck = document.getElementById("flag-deck");
+        const introScreen = document.getElementById("intro-screen");
+        const gameContainer = document.getElementById("game-container");
+        const feedbackOverlay = document.getElementById("feedback-overlay");
+        const feedbackEmoji = document.getElementById("feedback-emoji");
+        const feedbackText = document.getElementById("feedback-text");
+        const completionScreen = document.getElementById("completion-screen");
+        const audioBg = document.getElementById("audio-bg");
+        const audioCorrect = document.getElementById("audio-correct");
+        const audioWrong = document.getElementById("audio-wrong");
+
+        function forceActivateAudio() {
+            if (!audioStarted) {
+                audioBg.volume = 0.12;
+                audioBg.play().catch(() => {});
+                audioStarted = true;
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.85;
+                utterance.onstart = () => { if(audioBg) audioBg.volume = 0.03; };
+                utterance.onend = () => { if(audioBg) audioBg.volume = 0.12; };
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function getCarSVG(color) {
+            return `<svg class="car-svg" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4,18 Q4,8 15,8 L38,8 Q48,8 52,14 L57,16 Q59,18 57,20 L4,20 Z" fill="${color}"/>
+                <rect x="22" y="3" width="14" height="6" fill="#e2e8f0" rx="1"/>
+                <circle cx="16" cy="20" r="5.5" fill="#111827"/><circle cx="16" cy="20" r="2" fill="#94a3b8"/>
+                <circle cx="44" cy="20" r="5.5" fill="#111827"/><circle cx="44" cy="20" r="2" fill="#94a3b8"/>
+            </svg>`;
+        }
+
+        function setupGameLevel() {
+            document.querySelectorAll(".lane").forEach(l => l.remove());
+            flagDeck.innerHTML = "";
+            matchedCount = 0;
+
+            for (let i = 1; i <= 10; i++) {
+                const laneNode = document.createElement("div");
+                laneNode.classList.add("lane");
+
+                const carContainer = document.createElement("div");
+                carContainer.classList.add("car-container");
+                
+                // Pulled 1st place car right forward against finish boundary line (96px offset)
+                // Optimized the stepping intervals (31px) so the 10th car fits perfectly inside the view boundary
+                const baseLeftOffset = 96; 
+                const horizontalStepInterval = 31; 
+                const leftPixelDistance = baseLeftOffset + ((i - 1) * horizontalStepInterval);
+                carContainer.style.left = leftPixelDistance + "px";
+                
+                carContainer.innerHTML = getCarSVG(carColors[i - 1]);
+
+                const dropZone = document.createElement("div");
+                dropZone.classList.add("drop-zone");
+                dropZone.dataset.rank = i;
+                dropZone.textContent = "?";
+
+                carContainer.appendChild(dropZone);
+                laneNode.appendChild(carContainer);
+                raceTrack.appendChild(laneNode);
+            }
+
+            let flagScrambleArray = [...ordinalData].sort(() => Math.random() - 0.5);
+            flagScrambleArray.forEach((item) => {
+                const flagNode = document.createElement("div");
+                flagNode.classList.add("flag-card");
+                flagNode.textContent = item.code;
+                flagNode.dataset.rank = item.value;
+                flagNode.dataset.code = item.code;
+
+                attachPointerControls(flagNode);
+                flagDeck.appendChild(flagNode);
+            });
+        }
+
+        function attachPointerControls(element) {
+            const onStart = (e) => {
+                forceActivateAudio();
+                draggedElement = element;
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                element.style.transition = 'none';
+                element.style.zIndex = '999';
+                element.style.position = 'fixed';
+                element.style.width = '30px';  
+                element.style.height = '22px';
+                
+                moveAt(clientX, clientY);
+                speakText(element.dataset.code);
+            };
+
+            const onMove = (e) => {
+                if (!draggedElement || draggedElement !== element) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                moveAt(clientX, clientY);
+
+                document.querySelectorAll(".drop-zone").forEach(z => z.classList.remove("active-target"));
+                element.style.visibility = 'hidden';
+                const hoveringNode = document.elementFromPoint(clientX, clientY);
+                element.style.visibility = 'visible';
+                if(hoveringNode) {
+                    const matchedTarget = hoveringNode.closest('.drop-zone');
+                    if(matchedTarget && !matchedTarget.classList.contains('completed')) {
+                        matchedTarget.classList.add('active-target');
+                    }
+                }
+            };
+
+            function moveAt(nx, ny) {
+                element.style.left = (nx - 15) + 'px';
+                element.style.top = (ny - 11) + 'px';
+            }
+
+            const onEnd = (e) => {
+                if (!draggedElement || draggedElement !== element) return;
+                
+                const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+                document.querySelectorAll(".drop-zone").forEach(z => z.classList.remove("active-target"));
+                element.style.zIndex = '10';
+                element.style.visibility = 'hidden';
+                const landingNode = document.elementFromPoint(clientX, clientY);
+                element.style.visibility = 'visible';
+
+                const dropZoneTarget = landingNode ? landingNode.closest('.drop-zone') : null;
+
+                if (dropZoneTarget && !dropZoneTarget.classList.contains('completed') && dropZoneTarget.dataset.rank === element.dataset.rank) {
+                    audioCorrect.currentTime = 0;
+                    audioCorrect.play().catch(()=>{});
+                    
+                    dropZoneTarget.textContent = element.dataset.code;
+                    dropZoneTarget.classList.add('completed');
+                    element.remove();
+                    matchedCount++;
+
+                    feedbackEmoji.textContent = "👏";
+                    feedbackText.textContent = "Awesome!";
+                    feedbackOverlay.style.display = "flex";
+                    speakText("Awesome!");
+
+                    setTimeout(() => {
+                        feedbackOverlay.style.display = "none";
+                        if (matchedCount >= 10) {
+                            completionScreen.style.display = "flex";
+                            speakText("Fantastic Racing!");
+                        }
+                    }, 1000);
+                } else {
+                    audioWrong.currentTime = 0;
+                    audioWrong.play().catch(()=>{});
+
+                    feedbackEmoji.textContent = "❌";
+                    feedbackText.textContent = "Try Again!";
+                    feedbackOverlay.style.display = "flex";
+
+                    element.style.position = 'relative';
+                    element.style.left = '0px';
+                    element.style.top = '0px';
+                    element.style.width = '100%';
+                    element.style.height = '100%';
+
+                    setTimeout(() => { feedbackOverlay.style.display = "none"; }, 800);
+                }
+                draggedElement = null;
+            };
+
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            element.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        function resetWholeGame() {
+            completionScreen.style.display = "none";
+            setupGameLevel();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                introScreen.style.opacity = '0';
+                setTimeout(() => {
+                    introScreen.style.display = 'none';
+                    gameContainer.classList.add('visible');
+                    setupGameLevel();
+                }, 500);
+            }, 2000);
+
+            document.getElementById('btn-audio').addEventListener('click', () => {
+                speakText("Look at the race track and drag each ranking flag to the correct car according to its position from the finish line.");
+            });
+            document.getElementById('btn-restart').addEventListener('click', resetWholeGame);
+            document.getElementById('btn-final-restart').addEventListener('click', resetWholeGame);
+        });
+    </script>
+</body>
+</html>
